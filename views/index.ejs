@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function joinChat(event) {
+            event.preventDefault();
+            const sender = document.getElementById("name").value;
+            const chatId = document.getElementById("chatId").value;
+            if (chatId && sender) {
+                window.location.href = `/chat/${chatId}?sender=${encodeURIComponent(sender)}`;
+            }
+        }
+
+        function createChat() {
+            const sender = document.getElementById("name").value;
+            if (!sender) {
+                alert("Please enter your name first!");
+                return;
+            }
+            
+            fetch('/create-chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sender })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href = `/chat/${data.chatId}?sender=${encodeURIComponent(sender)}`;
+                });
+        }
+
+
+        function validateForm() {
+            const nameInput = document.getElementById("name");
+            const joinButton = document.querySelector(".btn-primary");
+            const createButton = document.querySelector(".btn-secondary");
+            
+            if (nameInput.value.trim() === "") {
+                joinButton.disabled = true;
+                createButton.disabled = true;
+            } else {
+                joinButton.disabled = false;
+                createButton.disabled = false;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <h1>Welcome to Chat App</h1>
+            <div class="input-group">
+                <input 
+                    id="name" 
+                    type="text" 
+                    placeholder="Enter your name" 
+                    required 
+                    oninput="validateForm()"
+                >
+            </div>
+            <form onsubmit="joinChat(event)">
+                <div class="input-group">
+                    <input type="text" id="chatId" placeholder="Enter Chat ID" required>
+                </div>
+                <button type="submit" class="btn btn-primary" disabled>Join Chat</button>
+            </form>
+            <div class="divider">
+                <span>or</span>
+            </div>
+            <button onclick="createChat()" class="btn btn-secondary" disabled>Create New Chat</button>
+        </div>
+    </div>
+</body>
+</html>
